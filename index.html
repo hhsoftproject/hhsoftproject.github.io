@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HHSoft — Building a better world with AI</title>
+<meta name="description" content="HHSoft is an applied AI studio building mobile apps that see, read and understand — so people spend less time on the boring parts of life.">
+<meta name="theme-color" content="#06070b">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06070b;
+    --bg-2: #0c0e15;
+    --text: #eef1f7;
+    --dim: #7d8599;
+    --line: #1b1f2b;
+    --v: #8b6cff;
+    --c: #2de2f5;
+    --grad: linear-gradient(95deg, var(--v), var(--c));
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+    font-size: 18px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  .serif { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-weight: 400; }
+  .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .wrap { padding-left: clamp(16px, 4vw, 56px); padding-right: clamp(16px, 4vw, 56px); }
+  .label { font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-bottom: 36px; display: flex; gap: 12px; align-items: center; }
+  .label b { font-weight: 500; color: var(--c); }
+  .label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  /* header */
+  header {
+    position: fixed; inset: 0 0 auto 0; z-index: 50; display: flex; justify-content: space-between; align-items: center;
+    padding: 18px clamp(16px, 4vw, 56px);
+    background: linear-gradient(var(--bg), transparent);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 21px; letter-spacing: -0.04em; }
+  .logo svg { width: 26px; height: 26px; }
+  .sys { font: 400 12px "JetBrains Mono", monospace; color: var(--dim); display: flex; gap: 18px; align-items: center; }
+  .sys .on { display: flex; align-items: center; gap: 8px; color: var(--text); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+
+  /* hero */
+  .hero { position: relative; min-height: 100svh; min-height: min(100svh, 1000px); display: flex; flex-direction: column; justify-content: center; padding-top: 110px; padding-bottom: 60px; overflow: hidden; }
+  #net { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 80% 30%, rgba(139,108,255,.20), transparent 70%),
+      radial-gradient(50% 40% at 15% 90%, rgba(45,226,245,.12), transparent 70%),
+      linear-gradient(transparent 70%, var(--bg));
+  }
+  .hero > .in { position: relative; z-index: 1; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 10px; font: 500 12px "JetBrains Mono", monospace; letter-spacing: .06em;
+    padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: rgba(12,14,21,.7); backdrop-filter: blur(6px); margin-bottom: 32px;
+  }
+  .tag i { font-style: normal; color: var(--c); }
+  h1 { margin: 0; font-weight: 900; font-size: clamp(52px, 10.5vw, 176px); line-height: .9; letter-spacing: -0.055em; max-width: 11ch; }
+  h1 .serif { font-size: 1.06em; letter-spacing: -0.03em; padding-right: .06em; }
+  .caret { display: inline-block; width: .07em; height: .8em; background: var(--c); vertical-align: -.02em; margin-left: .04em; animation: blink 1s steps(1) infinite; box-shadow: 0 0 18px var(--c); }
+  @keyframes blink { 50% { opacity: 0; } }
+  .hero p.sub { max-width: 540px; color: var(--dim); font-size: clamp(17px, 1.5vw, 20px); margin: 36px 0 0; }
+  .hero p.sub b { color: var(--text); font-weight: 500; }
+
+  /* prompt demo */
+  .demo { padding-top: 12vh; padding-bottom: 12vh; }
+  .demo-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(32px, 6vw, 96px); align-items: center; }
+  .big { font-size: clamp(34px, 4.8vw, 76px); line-height: 1.02; letter-spacing: -0.045em; font-weight: 800; margin: 0; }
+  .big .mute { color: var(--dim); }
+  .term {
+    border: 1px solid var(--line); border-radius: 18px; background: var(--bg-2); overflow: hidden;
+    box-shadow: 0 40px 120px -40px rgba(139,108,255,.35);
+  }
+  .term-top { display: flex; align-items: center; gap: 8px; padding: 14px 18px; border-bottom: 1px solid var(--line); font: 12px "JetBrains Mono", monospace; color: var(--dim); }
+  .term-top span { width: 10px; height: 10px; border-radius: 50%; background: #262b3a; }
+  .term-top em { margin-left: auto; font-style: normal; display: flex; gap: 8px; align-items: center; }
+  .term-body { padding: 26px 22px 30px; font: 15px/1.7 "JetBrains Mono", monospace; min-height: 280px; }
+  .q { color: var(--dim); }
+  .q::before { content: "› "; color: var(--c); }
+  .a { margin-top: 14px; white-space: pre-wrap; }
+  .a .k { color: var(--v); }
+  .meta { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font: 11px "JetBrains Mono", monospace; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--line); color: var(--dim); opacity: 0; transition: opacity .4s; }
+  .chip.show { opacity: 1; }
+  .tcaret { display: inline-block; width: 8px; height: 1.05em; background: var(--c); vertical-align: -3px; animation: blink 1s steps(1) infinite; }
+
+  /* marquee */
+  .marquee { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; white-space: nowrap; padding: 22px 0; }
+  .track { display: inline-flex; animation: slide 30s linear infinite; }
+  .track span { font: 500 clamp(15px, 1.6vw, 20px) "JetBrains Mono", monospace; letter-spacing: .04em; color: var(--dim); padding-right: 40px; }
+  .track span b { color: var(--text); font-weight: 500; }
+  .track span i { font-style: normal; color: var(--c); padding: 0 16px 0 0; }
+  @keyframes slide { to { transform: translateX(-50%); } }
+
+  /* capabilities */
+  .caps { padding-top: 14vh; padding-bottom: 8vh; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+  .cap { background: var(--bg); padding: 30px 26px 34px; position: relative; transition: background .4s; }
+  .cap:hover { background: var(--bg-2); }
+  .cap .n { font: 12px "JetBrains Mono", monospace; color: var(--dim); }
+  .cap svg { width: 56px; height: 56px; margin: 34px 0 30px; display: block; overflow: visible; }
+  .cap h3 { margin: 0 0 10px; font-size: 26px; letter-spacing: -0.03em; font-weight: 800; }
+  .cap p { margin: 0; color: var(--dim); font-size: 16px; }
+  .cap .ex { margin-top: 18px; font: 12px/1.6 "JetBrains Mono", monospace; color: var(--c); opacity: .85; }
+  .stroke { fill: none; stroke: url(#gr); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .scan { animation: scan 2.6s ease-in-out infinite; }
+  @keyframes scan { 50% { transform: translateY(26px); } }
+  .wave { stroke-dasharray: 120; animation: dash 2.4s linear infinite; }
+  @keyframes dash { to { stroke-dashoffset: -240; } }
+  .blink2 { animation: pulse 1.6s infinite; }
+
+  /* principles */
+  .prin { padding-top: 10vh; padding-bottom: 12vh; }
+  .rows .row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 24px; padding: 30px 0; border-top: 1px solid var(--line); align-items: baseline; }
+  .rows .row:last-child { border-bottom: 1px solid var(--line); }
+  .row .n { font: 12px "JetBrains Mono", monospace; color: var(--dim); }
+  .row h3 { margin: 0; font-size: clamp(28px, 3.4vw, 50px); letter-spacing: -0.045em; font-weight: 800; line-height: 1.05; }
+  .row p { margin: 0; color: var(--dim); max-width: 460px; }
+
+  /* contact */
+  .contact { padding-top: 12vh; padding-bottom: 12vh; position: relative; overflow: hidden; }
+  .contact::before { content: ""; position: absolute; width: 900px; height: 900px; right: -300px; bottom: -500px; background: radial-gradient(circle, rgba(139,108,255,.22), transparent 65%); pointer-events: none; }
+  .say { position: relative; display: block; font-weight: 900; letter-spacing: -0.06em; line-height: .95; font-size: clamp(60px, 13vw, 230px); margin: 0; }
+  .say .serif { padding-right: .08em; }
+  .mail { position: relative; display: inline-flex; gap: 14px; align-items: center; margin-top: 44px; font: 500 clamp(17px, 2.4vw, 32px) "JetBrains Mono", monospace; padding: 16px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-2); word-break: break-all; transition: border-color .3s; }
+  .mail:hover { border-color: var(--c); }
+
+  footer { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; padding: 26px clamp(16px, 4vw, 56px) 34px; border-top: 1px solid var(--line); font: 12px "JetBrains Mono", monospace; color: var(--dim); }
+
+  .rv { opacity: 0; transform: translateY(30px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .rv.in { opacity: 1; transform: none; }
+
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr 1fr; } .demo-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .rows .row { grid-template-columns: 1fr; gap: 8px; }
+    .sys .hide-m { display: none; }
+    .term-body { font-size: 13.5px; padding: 20px 16px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .rv { opacity: 1; transform: none; }
+    .chip { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#2de2f5"/></linearGradient></defs>
+</svg>
+
+<header>
+  <a href="#" class="logo" aria-label="HHSoft">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 8 16 16 24 8M8 24 16 16 24 24M8 8v16M24 8v16" stroke="url(#gr)" stroke-width="1.6" fill="none"/><circle cx="8" cy="8" r="3.2" fill="url(#gr)"/><circle cx="24" cy="8" r="3.2" fill="url(#gr)"/><circle cx="8" cy="24" r="3.2" fill="url(#gr)"/><circle cx="24" cy="24" r="3.2" fill="url(#gr)"/><circle cx="16" cy="16" r="3.8" fill="#eef1f7"/></svg>
+    HHSoft
+  </a>
+  <div class="sys">
+    <span class="hide-m">applied ai lab</span>
+    <span class="on"><span class="dot"></span>models online</span>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <canvas id="net" aria-hidden="true"></canvas>
+    <div class="in">
+      <div class="tag"><i>●</i> HHSoft — Applied AI for everyday life</div>
+      <h1 id="h1" aria-label="Building a better world with AI.">Building a <span class="serif g">better</span> world with AI.</h1>
+      <p class="sub"><b>We build mobile apps with AI inside</b> — apps that see, read and understand, so people spend less time on the boring parts of life.</p>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track">
+      <span><i>◆</i><b>Computer vision</b> <i>◆</i><b>On-device ML</b> <i>◆</i><b>Text recognition</b> <i>◆</i><b>Handwriting</b> <i>◆</i><b>Signal processing</b> <i>◆</i><b>Language models</b> <i>◆</i><b>Personalization</b> </span>
+      <span><i>◆</i><b>Computer vision</b> <i>◆</i><b>On-device ML</b> <i>◆</i><b>Text recognition</b> <i>◆</i><b>Handwriting</b> <i>◆</i><b>Signal processing</b> <i>◆</i><b>Language models</b> <i>◆</i><b>Personalization</b> </span>
+    </div>
+  </div>
+
+  <section class="demo wrap">
+    <div class="label rv"><b>01</b> What AI should feel like</div>
+    <div class="demo-grid">
+      <p class="big rv">You ask once. <span class="mute">The app quietly</span> <span class="g">handles the rest.</span></p>
+      <div class="term rv" aria-label="Example of an AI task inside an HHSoft app">
+        <div class="term-top"><span></span><span></span><span></span><em><span class="dot"></span>running on device</em></div>
+        <div class="term-body"><div class="q" id="q"></div><div class="a" id="a"></div><div class="meta" id="meta"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="caps wrap">
+    <div class="label rv"><b>02</b> Capabilities</div>
+    <div class="grid rv">
+      <div class="cap">
+        <span class="n">/vision</span>
+        <svg viewBox="0 0 56 56"><path class="stroke" d="M6 18V10a4 4 0 0 1 4-4h8M38 6h8a4 4 0 0 1 4 4v8M50 38v8a4 4 0 0 1-4 4h-8M18 50h-8a4 4 0 0 1-4-4v-8"/><rect class="stroke" x="16" y="16" width="24" height="24" rx="4" opacity=".35"/><line class="stroke scan" x1="12" y1="15" x2="44" y2="15"/></svg>
+        <h3>See</h3>
+        <p>Cameras that understand what they're pointed at — documents, faces, receipts.</p>
+        <div class="ex">scan · detect · crop</div>
+      </div>
+      <div class="cap">
+        <span class="n">/language</span>
+        <svg viewBox="0 0 56 56"><path class="stroke" d="M10 14h36M10 24h28M10 34h32M10 44h18"/><rect x="31" y="40" width="6" height="8" rx="1" fill="#2de2f5" class="blink2"/></svg>
+        <h3>Read</h3>
+        <p>Text and handwriting turned into something you can search, copy and use.</p>
+        <div class="ex">ocr · handwriting · translate</div>
+      </div>
+      <div class="cap">
+        <span class="n">/signals</span>
+        <svg viewBox="0 0 56 56"><path class="stroke wave" d="M4 30h10l4-12 6 24 6-30 5 18h17"/></svg>
+        <h3>Sense</h3>
+        <p>Everyday sensors turned into useful signals — like a pulse read from a phone camera.</p>
+        <div class="ex">measure · filter · trend</div>
+      </div>
+      <div class="cap">
+        <span class="n">/learning</span>
+        <svg viewBox="0 0 56 56"><path class="stroke" d="M15 16l10 10M15 40l10-10M32 28h7" opacity=".6"/><circle class="stroke" cx="12" cy="14" r="4"/><circle class="stroke" cx="12" cy="42" r="4"/><circle class="stroke" cx="44" cy="28" r="5"/><circle class="stroke" cx="28" cy="28" r="4"/></svg>
+        <h3>Learn</h3>
+        <p>Apps that adapt to your routine and remind you at the moment it actually helps.</p>
+        <div class="ex">personalize · predict · nudge</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="prin wrap">
+    <div class="label rv"><b>03</b> How we build</div>
+    <div class="rows">
+      <div class="row rv"><span class="n">/01</span><h3>Useful before clever.</h3><p>We start from a real, everyday problem — and measure whether the AI actually solved it.</p></div>
+      <div class="row rv"><span class="n">/02</span><h3>Private by design.</h3><p>We keep processing on the device whenever we can, and collect only what an app truly needs.</p></div>
+      <div class="row rv"><span class="n">/03</span><h3>Every language.</h3><p>Our apps speak each user's language from day one — not as an afterthought.</p></div>
+      <div class="row rv"><span class="n">/04</span><h3>Driven by data.</h3><p>We build our own tools to measure what works, and invest only where it helps people.</p></div>
+    </div>
+  </section>
+
+  <section class="contact wrap">
+    <div class="label rv"><b>04</b> Contact</div>
+    <a href="mailto:hhsoftcom@gmail.com" class="say rv">Let's <span class="serif g">talk.</span></a>
+    <a href="mailto:hhsoftcom@gmail.com" class="mail rv">hhsoftcom@gmail.com <span class="g">↗</span></a>
+  </section>
+</main>
+
+<footer>
+  <span>© 2026 HHSoft. All rights reserved.</span>
+  <span>Business Registration No. 104-87-01506</span>
+  <a href="mailto:hhsoftcom@gmail.com">hhsoftcom@gmail.com</a>
+</footer>
+
+<script>
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// reveal
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+// neural net background
+(() => {
+  const cv = document.getElementById('net'), cx = cv.getContext('2d');
+  let W, H, pts, mouse = { x: -999, y: -999 };
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  function size() {
+    W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(110, W * H / 14000));
+    pts = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35, r: Math.random() * 1.6 + .6 }));
+  }
+  size(); addEventListener('resize', size);
+  cv.parentElement.addEventListener('mousemove', e => { const b = cv.getBoundingClientRect(); mouse.x = e.clientX - b.left; mouse.y = e.clientY - b.top; });
+  cv.parentElement.addEventListener('mouseleave', () => { mouse.x = mouse.y = -999; });
+  const D = 130;
+  function frame() {
+    cx.clearRect(0, 0, W, H);
+    for (const p of pts) {
+      if (!still) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1; }
+      const dm = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+      if (dm < 160 && !still) { p.x += (mouse.x - p.x) * .006; p.y += (mouse.y - p.y) * .006; }
+    }
+    for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+      const a = pts[i], b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d < D) {
+        const near = Math.min(Math.hypot(a.x - mouse.x, a.y - mouse.y), 200) / 200;
+        cx.strokeStyle = `rgba(${near < 1 ? '45,226,245' : '139,108,255'},${(1 - d / D) * (near < 1 ? .55 : .22)})`;
+        cx.lineWidth = 1; cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke();
+      }
+    }
+    for (const p of pts) { cx.fillStyle = 'rgba(238,241,247,.7)'; cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill(); }
+    if (!still) requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// headline: stream tokens like a model
+(() => {
+  const h = document.getElementById('h1');
+  if (still) { h.insertAdjacentHTML('beforeend', '<span class="caret"></span>'); return; }
+  const parts = h.innerHTML.split(/(<[^>]+>|\s+)/).filter(Boolean);
+  h.innerHTML = '<span class="caret"></span>';
+  let i = 0, out = '';
+  (function step() {
+    if (i >= parts.length) return;
+    const p = parts[i++]; out += p;
+    if (/^</.test(p) || /^\s+$/.test(p)) return step();
+    h.innerHTML = out + '<span class="caret"></span>';
+    setTimeout(step, 90 + Math.random() * 90);
+  })();
+})();
+
+// terminal demo
+(() => {
+  const tasks = [
+    { q: 'read the text in this photo', a: 'Found <span class="k">3 paragraphs</span> in Korean.\nCopied to clipboard. Want it in English?', m: ['ocr', 'on-device', '0.4s'] },
+    { q: 'remind me to drink water', a: 'Done. I\'ll nudge you <span class="k">every 90 min</span>,\nquieter after 10pm.', m: ['schedule', 'personalized', 'no account'] },
+    { q: 'scan this receipt', a: 'Coffee · <span class="k">4,500 KRW</span> · Food & drink\nAdded to today\'s spending.', m: ['vision', 'categorize', '0.6s'] },
+    { q: 'check my heart rate', a: 'Hold your fingertip on the camera…\n<span class="k">72 bpm</span> · resting range.', m: ['signal', 'camera', '30s'] },
+  ];
+  const q = document.getElementById('q'), a = document.getElementById('a'), meta = document.getElementById('meta');
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  function chips(t, show) { meta.innerHTML = t.m.map(x => `<span class="chip${show ? ' show' : ''}">${x}</span>`).join(''); }
+  if (still) { const t = tasks[0]; q.textContent = t.q; a.innerHTML = t.a; chips(t, true); return; }
+  async function type(el, text, speed) {
+    const parts = text.split(/(<[^>]+>)/); let acc = '';
+    for (const p of parts) {
+      if (p.startsWith('<')) { acc += p; continue; }
+      for (const ch of p) { acc += ch; el.innerHTML = acc + '<span class="tcaret"></span>'; await wait(speed()); }
+    }
+    el.innerHTML = acc;
+  }
+  (async function loop() {
+    for (let k = 0; ; k = (k + 1) % tasks.length) {
+      const t = tasks[k]; q.textContent = ''; a.innerHTML = ''; chips(t, false);
+      await type(q, t.q, () => 45 + Math.random() * 60);
+      a.innerHTML = '<span class="tcaret"></span>'; await wait(700);
+      await type(a, t.a, () => 14 + Math.random() * 18);
+      meta.querySelectorAll('.chip').forEach((c, i) => setTimeout(() => c.classList.add('show'), i * 140));
+      await wait(3200);
+    }
+  })();
+})();
+</script>
+</body>
+</html>
