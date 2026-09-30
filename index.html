@@ -64,9 +64,11 @@
     padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: rgba(12,14,21,.7); backdrop-filter: blur(6px); margin-bottom: 32px;
   }
   .tag i { font-style: normal; color: var(--c); }
-  h1 { margin: 0; font-weight: 900; font-size: clamp(52px, 10.5vw, 176px); line-height: .9; letter-spacing: -0.055em; max-width: 11ch; }
+  h1 { margin: 0; font-weight: 900; font-size: clamp(44px, 10.5vw, 176px); line-height: .9; letter-spacing: -0.055em; max-width: 11ch; }
   h1 .serif { font-size: 1.06em; letter-spacing: -0.03em; padding-right: .06em; }
-  .caret { display: inline-block; width: .07em; height: .8em; background: var(--c); vertical-align: -.02em; margin-left: .04em; animation: blink 1s steps(1) infinite; box-shadow: 0 0 18px var(--c); }
+  h1 .w { visibility: hidden; }
+  h1 .w.on { visibility: visible; }
+  .caret { display: inline-block; width: .07em; height: .8em; background: var(--c); vertical-align: -.02em; margin-left: .04em; margin-right: -.11em; animation: blink 1s steps(1) infinite; box-shadow: 0 0 18px var(--c); }
   @keyframes blink { 50% { opacity: 0; } }
   .hero p.sub { max-width: 540px; color: var(--dim); font-size: clamp(17px, 1.5vw, 20px); margin: 36px 0 0; }
   .hero p.sub b { color: var(--text); font-weight: 500; }
@@ -144,6 +146,7 @@
     .grid { grid-template-columns: 1fr; }
     .rows .row { grid-template-columns: 1fr; gap: 8px; }
     .sys .hide-m { display: none; }
+    .hide-s { display: none; }
     .term-body { font-size: 13.5px; padding: 20px 16px 24px; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -174,7 +177,7 @@
   <section class="hero wrap">
     <canvas id="net" aria-hidden="true"></canvas>
     <div class="in">
-      <div class="tag"><i>●</i> HHSoft — Applied AI for everyday life</div>
+      <div class="tag"><i>●</i> <span class="hide-s">HHSoft — </span>Applied AI for everyday life</div>
       <h1 id="h1" aria-label="Building a better world with AI.">Building a <span class="serif g">better</span> world with AI.</h1>
       <p class="sub"><b>We build mobile apps with AI inside</b> — apps that see, read and understand, so people spend less time on the boring parts of life.</p>
     </div>
@@ -297,18 +300,30 @@ document.querySelectorAll('.rv').forEach(el => io.observe(el));
   frame();
 })();
 
-// headline: stream tokens like a model
+// headline: stream tokens like a model — 자리는 처음부터 잡아 두고 단어만 드러낸다(레이아웃이 안 흔들린다)
 (() => {
   const h = document.getElementById('h1');
-  if (still) { h.insertAdjacentHTML('beforeend', '<span class="caret"></span>'); return; }
-  const parts = h.innerHTML.split(/(<[^>]+>|\s+)/).filter(Boolean);
-  h.innerHTML = '<span class="caret"></span>';
-  let i = 0, out = '';
+  const caret = document.createElement('span'); caret.className = 'caret';
+  if (still) { h.appendChild(caret); return; }
+  const words = [];
+  (function wrap(node) {
+    for (const n of [...node.childNodes]) {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(t => {
+          if (!t) return;
+          if (/^\s+$/.test(t)) { frag.appendChild(document.createTextNode(t)); return; }
+          const w = document.createElement('span'); w.textContent = t; w.className = 'w'; words.push(w); frag.appendChild(w);
+        });
+        n.replaceWith(frag);
+      } else wrap(n);
+    }
+  })(h);
+  words[0].before(caret);
+  let i = 0;
   (function step() {
-    if (i >= parts.length) return;
-    const p = parts[i++]; out += p;
-    if (/^</.test(p) || /^\s+$/.test(p)) return step();
-    h.innerHTML = out + '<span class="caret"></span>';
+    if (i >= words.length) return;
+    const w = words[i++]; w.classList.add('on'); w.after(caret);
     setTimeout(step, 90 + Math.random() * 90);
   })();
 })();
